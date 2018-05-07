@@ -15,12 +15,15 @@ const AppContent = ({
 	getStarred
 }) => (
 	<div
-		className="App"
+		className="App jumbotron"
 		style={{
-			width: 600,
-			margin: "20px auto"
+			width: 800,
+			margin: "auto"
 		}}
 	>
+		<h2 className="text-center" style={{ color: "grey" }}>
+			Buscador de Perfis do Github
+		</h2>
 		<Search handleSearch={handleSearch} />
 		{!!userinfo && <UserInfo userinfo={userinfo} />}
 		{!!userinfo && <Actions getRepos={getRepos} getStarred={getStarred} />}

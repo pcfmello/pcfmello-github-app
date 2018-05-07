@@ -7,7 +7,7 @@ const Search = ({ handleSearch }) => {
 			<input
 				type="text"
 				className="form-control search"
-				placeholder="Pesquisar perfis"
+				placeholder="Digite seu username"
 				onKeyUp={handleSearch}
 			/>
 		</div>

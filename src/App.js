@@ -7,7 +7,6 @@ import ajax from "@fdaciuk/ajax";
 
 import AppContent from "./components/app-content";
 
-const GITHUB_API_URL = "https://api.github.com/users";
 class App extends Component {
 	constructor() {
 		super();
@@ -17,14 +16,19 @@ class App extends Component {
 			starred: []
 		};
 	}
+	getGithubApiUrl(username, type) {
+		const internalUsername = username ? `/${username}` : "";
+		const internalType = type ? `/${type}` : "";
+		return `https://api.github.com/users${internalUsername}${internalType}`;
+	}
 
 	handleSearch(e) {
 		const ENTER = 13;
 		const username = e.target.value;
 		const keyCode = e.which || e.keyCode;
-		if (keyCode === ENTER) {
+		if (keyCode === ENTER && username) {
 			ajax()
-				.get(`${GITHUB_API_URL}/${username}`)
+				.get(this.getGithubApiUrl(username))
 				.then(result => {
 					this.setState({
 						userinfo: {
@@ -36,25 +40,29 @@ class App extends Component {
 							following: result.following,
 							url_repos: result.repos_url,
 							url_starred: result.starred_url
-						}
+						},
+						repos: [],
+						starred: []
 					});
 				});
 		}
 	}
 
 	getRepos(type) {
-		ajax()
-			.get(`${GITHUB_API_URL}/${this.state.userinfo.username}/${type}`)
-			.then(result => {
-				this.setState({
-					[type]: result.map(repo => ({
-						id: repo.id,
-						name: repo.name,
-						full_name: repo.full_name,
-						html_url: repo.html_url
-					}))
+		return () => {
+			ajax()
+				.get(this.getGithubApiUrl(this.state.userinfo.username, type))
+				.then(result => {
+					this.setState({
+						[type]: result.map(repo => ({
+							id: repo.id,
+							name: repo.name,
+							full_name: repo.full_name,
+							html_url: repo.html_url
+						}))
+					});
 				});
-			});
+		};
 	}
 
 	render() {
@@ -64,8 +72,8 @@ class App extends Component {
 				repos={this.state.repos}
 				starred={this.state.starred}
 				handleSearch={e => this.handleSearch(e)}
-				getRepos={() => this.getRepos("repos")}
-				getStarred={() => this.getRepos("starred")}
+				getRepos={this.getRepos("repos")}
+				getStarred={this.getRepos("starred")}
 			/>
 		);
 	}
