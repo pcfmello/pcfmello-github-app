@@ -12,7 +12,8 @@ const AppContent = ({
 	starred,
 	handleSearch,
 	getRepos,
-	getStarred
+	getStarred,
+	isFetching
 }) => (
 	<div
 		className="App jumbotron"
@@ -24,13 +25,25 @@ const AppContent = ({
 		<h2 className="text-center" style={{ color: "grey" }}>
 			Buscador de Perfis do Github
 		</h2>
-		<Search handleSearch={handleSearch} />
-		{!!userinfo && <UserInfo userinfo={userinfo} />}
-		{!!userinfo && <Actions getRepos={getRepos} getStarred={getStarred} />}
+		<Search handleSearch={handleSearch} isDisabled={isFetching} />
 
-		{!!repos.length && <Repos title="Repositórios" repos={repos} isUserRepos />}
+		{isFetching && (
+			<div className="text-center card">
+				<div className="card-body">Carregando</div>
+			</div>
+		)}
+		{!isFetching && (
+			<div>
+				{!!userinfo && <UserInfo userinfo={userinfo} />}
+				{!!userinfo && <Actions getRepos={getRepos} getStarred={getStarred} />}
 
-		{!!starred.length && <Repos title="Favoritos" repos={starred} />}
+				{!!repos.length && (
+					<Repos title="Repositórios" repos={repos} isUserRepos />
+				)}
+
+				{!!starred.length && <Repos title="Favoritos" repos={starred} />}
+			</div>
+		)}
 	</div>
 );
 
@@ -38,6 +51,7 @@ AppContent.propTypes = {
 	userinfo: PropTypes.object,
 	repos: PropTypes.array.isRequired,
 	starred: PropTypes.array.isRequired,
+	isFetching: PropTypes.bool.isRequired,
 	handleSearch: PropTypes.func.isRequired,
 	getRepos: PropTypes.func.isRequired,
 	getStarred: PropTypes.func.isRequired

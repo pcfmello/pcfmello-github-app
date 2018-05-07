@@ -13,8 +13,13 @@ class App extends Component {
 		this.state = {
 			userinfo: null,
 			repos: [],
-			starred: []
+			starred: [],
+			isFetching: false
 		};
+
+		// Forma recomendada de fazer o bind das funções de classes com ReactJS
+		this.getGithubApiUrl = this.getGithubApiUrl.bind(this);
+		this.handleSearch = this.handleSearch.bind(this);
 	}
 	getGithubApiUrl(username, type) {
 		const internalUsername = username ? `/${username}` : "";
@@ -24,13 +29,16 @@ class App extends Component {
 
 	handleSearch(e) {
 		// Persiste o evento para ser acessado posteriormente, não anulando-o conforme ação padrão do React
-		const eventTarget = e.target;
+		//const eventTarget = e.target;
 
 		const ENTER = 13;
-		const username = eventTarget.value;
+		const username = e.target.value;
 		const keyCode = e.which || e.keyCode;
 		if (keyCode === ENTER && username) {
-			eventTarget.disabled = true;
+			//eventTarget.disabled = true;
+			this.setState({
+				isFetching: true
+			});
 			ajax()
 				.get(this.getGithubApiUrl(username))
 				.then(result => {
@@ -49,7 +57,12 @@ class App extends Component {
 						starred: []
 					});
 				})
-				.always(() => (eventTarget.disabled = false));
+				.always(() => {
+					//eventTarget.disabled = false;
+					this.setState({
+						isFetching: false
+					});
+				});
 		}
 	}
 
@@ -76,7 +89,8 @@ class App extends Component {
 				userinfo={this.state.userinfo}
 				repos={this.state.repos}
 				starred={this.state.starred}
-				handleSearch={e => this.handleSearch(e)}
+				isFetching={this.state.isFetching}
+				handleSearch={this.handleSearch}
 				getRepos={this.getRepos("repos")}
 				getStarred={this.getRepos("starred")}
 			/>
