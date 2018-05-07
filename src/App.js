@@ -23,10 +23,14 @@ class App extends Component {
 	}
 
 	handleSearch(e) {
+		// Persiste o evento para ser acessado posteriormente, não anulando-o conforme ação padrão do React
+		const eventTarget = e.target;
+
 		const ENTER = 13;
-		const username = e.target.value;
+		const username = eventTarget.value;
 		const keyCode = e.which || e.keyCode;
 		if (keyCode === ENTER && username) {
+			eventTarget.disabled = true;
 			ajax()
 				.get(this.getGithubApiUrl(username))
 				.then(result => {
@@ -44,7 +48,8 @@ class App extends Component {
 						repos: [],
 						starred: []
 					});
-				});
+				})
+				.always(() => (eventTarget.disabled = false));
 		}
 	}
 
